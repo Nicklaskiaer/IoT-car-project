@@ -3,6 +3,8 @@ import time
 import logging
 import ssl
 import datetime
+import pygame
+
 
 broker = 'dfb0ec72cc864eddaee0fe147972f4af.s1.eu.hivemq.cloud'
 port = 8883
@@ -81,25 +83,96 @@ def subscribe(client: mqtt_client):
 
 ######################################################################################
 
-client = connect_mqtt()
-subscribe(client)
-client.loop_start()
 
+pygame.init()
+screen = pygame.display.set_mode((800, 480))
+clock = pygame.time.Clock()
 
-# Publish 10 messages
-for i in range(10) :
-    time_now = datetime.datetime.now()
-    result = client.publish("car_data", "Test", 1, True, None)
-    status = result[0]
+y_speed = 0.0
+y_forward = True
+x_speed = 0.0
+x_right = True
+
+running = True
+while running:
+
+    # Did the user click the window close button?
+    for event in pygame.event.get():
+
+        if event.type == pygame.QUIT:
+            running = False
+
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_w] :
+        y_speed = 1.0
+        y_forward = True
     
-    if status == 0:
-        pub_time = time_now
-        print(time_now, " : Message send")
-    else :
-        print("Failed to send message!!!")
+    if keys[pygame.K_s] :
+        if (y_speed != 0.0) :
+            y_speed = 0.0
+        else :
+            y_speed = 1.0
+            y_forward = False
     
-    time.sleep(10.0)
+    if keys[pygame.K_a] :
+        x_speed = 1.0
+        x_right = False
 
-client.loop_stop()
+        if (y_speed != 0.0) :
+            y_speed = 0.5
+    
+    if keys[pygame.K_d] :
+        if (x_speed != 0.0) :
+            x_speed = 0.0
+            if (y_speed != 0.0) :
+                y_speed = 1.0
+        else :
+            x_speed = 1.0
+            x_right = True
 
-print("Bye bye")
+            if (y_speed != 0.0) :
+                y_speed = 0.5
+
+
+    print("Y speed: ", y_speed, ", dir: ", y_forward)
+    print("Turn: ", x_speed, ", dir: ", x_right)
+
+    y_speed = 0.0
+    x_speed = 0.0
+
+    # Fill the background with white
+    screen.fill((255, 255, 255))
+
+    # Flip the display
+    pygame.display.flip()
+
+    clock.tick(5)
+    pygame.display.update()
+
+# Done! Time to quit.
+pygame.quit()
+
+
+# client = connect_mqtt()
+# subscribe(client)
+# client.loop_start()
+
+
+# # Publish 10 messages
+# for i in range(10) :
+#     time_now = datetime.datetime.now()
+#     result = client.publish("car_data", "Test", 1, True, None)
+#     status = result[0]
+    
+#     if status == 0:
+#         pub_time = time_now
+#         print(time_now, " : Message send")
+#     else :
+#         print("Failed to send message!!!")
+    
+#     time.sleep(10.0)
+
+# client.loop_stop()
+
+# print("Bye bye")
