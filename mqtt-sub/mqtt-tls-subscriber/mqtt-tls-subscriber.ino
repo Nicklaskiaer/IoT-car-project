@@ -4,23 +4,25 @@
 
 
 /****** WiFi Connection Details *******/
-const char* ssid = "AndroidAP1063";
-const char* password = "alamakota123";
+const char* ssid = "";
+const char* password = "";
 
 /******* MQTT Broker Connection Details *******/
 const char* mqtt_server = "dfb0ec72cc864eddaee0fe147972f4af.s1.eu.hivemq.cloud";
-const char* mqtt_username = "publisher-test";
-const char* mqtt_password = "Default1";
+const char* mqtt_username = "auto-car";
+const char* mqtt_password = "420Driving420";
 const int mqtt_port = 8883;
+
+const char* data_topic = "car_data";
+const char* latency_topic = "time/ack";
 
 WiFiClientSecure espClient;
 
 /**** MQTT Client Initialisation Using WiFi Connection *****/
 PubSubClient client(espClient);
 
-unsigned long lastMsg = 0;
-#define MSG_BUFFER_SIZE (32)
-char msg[MSG_BUFFER_SIZE];
+
+
 
 static const char *rootCA PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
@@ -56,6 +58,9 @@ emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 -----END CERTIFICATE-----
 )EOF";
 
+
+
+
 /************* Connect to WiFi ***********/
 void setup_wifi() {
   
@@ -77,6 +82,8 @@ void setup_wifi() {
 }
 
 
+
+
 /************* Connect to MQTT Broker ***********/
 void reconnect() {
   
@@ -84,13 +91,12 @@ void reconnect() {
   while (!client.connected()) {
     
     Serial.print("Attempting MQTT connection...");
-    String clientId = "publisher-test";   // Create a random client ID
+    String clientId = "car-test";
 
     // Attempt to connect
     if (client.connect(clientId.c_str(), mqtt_username, mqtt_password)) {
       Serial.println("connected");
-
-      client.subscribe("car-data");   // subscribe the topics here
+      client.subscribe(data_topic, 0); 
 
     } else {
       Serial.print("failed, rc=");
@@ -101,29 +107,19 @@ void reconnect() {
   }
 }
 
-/***** Call back Method for Receiving MQTT messages and Switching LED ****/
 
+
+
+/***** Call back Method for Receiving MQTT messages****/
 void callback(char* topic, byte* payload, unsigned int length) {
+  
+  client.publish(latency_topic, "ack");
+  
   String incommingMessage = "";
   for (int i = 0; i < length; i++) incommingMessage+=(char)payload[i];
-
   Serial.println("Message arrived ["+String(topic)+"]"+incommingMessage);
-
-  // //--- check the incomming message
-  //   if ( strcmp(topic,"led_state") == 0) {
-      
-  //     if (incommingMessage.equals("1"));   // Turn the LED on
-      
-  //     else ;  // Turn the LED off
-  // }
 }
 
-
-/**** Method for Publishing MQTT Messages **********/
-void publishMessage(const char* topic, const char * payload , boolean retained){
-  if (client.publish(topic, payload, true))
-    Serial.println("Message publised ["+String(topic)+"]: "+payload);
-}
 
 
 void setup() {
@@ -135,24 +131,19 @@ void setup() {
   
   // espClient.setInsecure();
   espClient.setCACert(rootCA);
-  
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
 }
 
 
-/******** Main Function *************/
+
+
 void loop() {
 
   if (!client.connected()) 
     reconnect(); // check if client is connected
   
   client.loop();
-
-  const char * message = "Test"; 
-
-  publishMessage("car-data", message, true);
-
-  delay(10000);
-
+  delay(10);
 }
+
