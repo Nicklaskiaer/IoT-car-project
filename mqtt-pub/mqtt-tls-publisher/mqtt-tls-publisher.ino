@@ -2,6 +2,12 @@
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
 
+/****** Joystick Details ******/
+#define VRX_PIN  34
+#define VRY_PIN  35
+int valueX = 0; // to store the X-axis value
+int valueY = 0; // to store the Y-axis value
+const char* direction;
 
 /****** WiFi Connection Details *******/
 const char* ssid = "AndroidAP1063";
@@ -9,8 +15,8 @@ const char* password = "alamakota123";
 
 /******* MQTT Broker Connection Details *******/
 const char* mqtt_server = "dfb0ec72cc864eddaee0fe147972f4af.s1.eu.hivemq.cloud";
-const char* mqtt_username = "publisher-test";
-const char* mqtt_password = "Default1";
+const char* mqtt_username = "controller-test";
+const char* mqtt_password = "ControllerTest1";
 const int mqtt_port = 8883;
 
 WiFiClientSecure espClient;
@@ -90,7 +96,7 @@ void reconnect() {
     if (client.connect(clientId.c_str(), mqtt_username, mqtt_password)) {
       Serial.println("connected");
 
-      client.subscribe("car-data");   // subscribe the topics here
+    client.subscribe("time/ack", 0);
 
     } else {
       Serial.print("failed, rc=");
@@ -108,14 +114,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
   for (int i = 0; i < length; i++) incommingMessage+=(char)payload[i];
 
   Serial.println("Message arrived ["+String(topic)+"]"+incommingMessage);
-
-  // //--- check the incomming message
-  //   if ( strcmp(topic,"led_state") == 0) {
-      
-  //     if (incommingMessage.equals("1"));   // Turn the LED on
-      
-  //     else ;  // Turn the LED off
-  // }
 }
 
 
@@ -123,6 +121,24 @@ void callback(char* topic, byte* payload, unsigned int length) {
 void publishMessage(const char* topic, const char * payload , boolean retained){
   if (client.publish(topic, payload, true))
     Serial.println("Message publised ["+String(topic)+"]: "+payload);
+}
+
+
+/****** Joystick reader ******/ 
+const char* getCharDirection(int x, int y){
+  if (x > 2000 && (y < 3000 && y > 1000)){
+    return "f";
+  }
+  if (x < 1000 && (y < 3000 && y > 1000)){
+    return "b";
+  }
+  if (y < 1100 && (x < 2000 && x > 1000)){
+    return "r";
+  }
+  if (y > 2500 && (x < 2000 && x > 1000)){
+    return "l";
+  }
+  return "x";
 }
 
 
@@ -149,10 +165,21 @@ void loop() {
   
   client.loop();
 
-  const char * message = "Test"; 
+  //const char * message = "Test"; 
 
-  publishMessage("car-data", message, true);
+  valueX = analogRead(VRX_PIN);
+  valueY = analogRead(VRY_PIN);
 
-  delay(10000);
+  Serial.print("X value");
+  Serial.println(valueX);
+  Serial.print("Y value");
+  Serial.println(valueY);
+
+  direction = getCharDirection(valueX, valueY);
+
+  publishMessage("car_data", direction, true);
+
+
+  delay(1000);
 
 }
