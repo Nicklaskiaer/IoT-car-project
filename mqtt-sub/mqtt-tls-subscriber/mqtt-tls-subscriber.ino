@@ -4,8 +4,8 @@
 
 
 /****** WiFi Connection Details *******/
-const char* ssid = "";
-const char* password = "";
+const char* ssid = "AndroidAP1063";
+const char* password = "alamakota123";
 
 /******* MQTT Broker Connection Details *******/
 const char* mqtt_server = "dfb0ec72cc864eddaee0fe147972f4af.s1.eu.hivemq.cloud";
@@ -20,9 +20,6 @@ WiFiClientSecure espClient;
 
 /**** MQTT Client Initialisation Using WiFi Connection *****/
 PubSubClient client(espClient);
-
-
-
 
 static const char *rootCA PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
@@ -59,8 +56,6 @@ emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 )EOF";
 
 
-
-
 /************* Connect to WiFi ***********/
 void setup_wifi() {
   
@@ -80,8 +75,6 @@ void setup_wifi() {
   Serial.println("\nWiFi connected\nIP address: ");
   Serial.println(WiFi.localIP());
 }
-
-
 
 
 /************* Connect to MQTT Broker ***********/
@@ -113,11 +106,11 @@ void reconnect() {
 /***** Call back Method for Receiving MQTT messages****/
 void callback(char* topic, byte* payload, unsigned int length) {
   
-  client.publish(latency_topic, "ack");
-  
   String incommingMessage = "";
   for (int i = 0; i < length; i++) incommingMessage+=(char)payload[i];
   Serial.println("Message arrived ["+String(topic)+"]"+incommingMessage);
+
+  client.publish(latency_topic, "ack");
 }
 
 
@@ -131,6 +124,7 @@ void setup() {
   
   // espClient.setInsecure();
   espClient.setCACert(rootCA);
+  client.setBufferSize(512);
   client.setServer(mqtt_server, mqtt_port);
   client.setCallback(callback);
 }
