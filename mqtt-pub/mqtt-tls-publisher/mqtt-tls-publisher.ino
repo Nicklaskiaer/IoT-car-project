@@ -9,8 +9,8 @@ const char* password = "alamakota123";
 
 /******* MQTT Broker Connection Details *******/
 const char* mqtt_server = "dfb0ec72cc864eddaee0fe147972f4af.s1.eu.hivemq.cloud";
-const char* mqtt_username = "publisher-test";
-const char* mqtt_password = "Default1";
+const char* mqtt_username = "controller-test";
+const char* mqtt_password = "ControllerTest1";
 const int mqtt_port = 8883;
 
 WiFiClientSecure espClient;
@@ -90,7 +90,7 @@ void reconnect() {
     if (client.connect(clientId.c_str(), mqtt_username, mqtt_password)) {
       Serial.println("connected");
 
-      client.subscribe("car-data");   // subscribe the topics here
+    client.subscribe("time/ack", 0);
 
     } else {
       Serial.print("failed, rc=");
@@ -108,14 +108,6 @@ void callback(char* topic, byte* payload, unsigned int length) {
   for (int i = 0; i < length; i++) incommingMessage+=(char)payload[i];
 
   Serial.println("Message arrived ["+String(topic)+"]"+incommingMessage);
-
-  // //--- check the incomming message
-  //   if ( strcmp(topic,"led_state") == 0) {
-      
-  //     if (incommingMessage.equals("1"));   // Turn the LED on
-      
-  //     else ;  // Turn the LED off
-  // }
 }
 
 
@@ -151,7 +143,7 @@ void loop() {
 
   const char * message = "Test"; 
 
-  publishMessage("car-data", message, true);
+  publishMessage("car_data", message, true);
 
   delay(10000);
 
