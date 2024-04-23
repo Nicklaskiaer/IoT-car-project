@@ -17,6 +17,48 @@ int newmode = 0;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 uint8_t data;
 
+
+#define SERVICE_UUID        "4fafc201-1fb5-459e-8fcc-c5c9c331914b"
+#define CHARACTERISTIC_UUID "beb5483e-36e1-4688-b7f5-ea07361b26a8"
+
+
+BLEServer *pServer = NULL;
+BLECharacteristic *pCharacteristic = NULL;
+BLEService *pService = NULL;
+
+void bleSetup() {
+    Serial.println("Starting BLE work!");
+
+    BLEDevice::init("Long name works now");
+    pServer = BLEDevice::createServer();
+    pService = pServer->createService(SERVICE_UUID);
+    pCharacteristic = pService->createCharacteristic(
+                                          CHARACTERISTIC_UUID,
+                                          BLECharacteristic::PROPERTY_READ |
+                                          BLECharacteristic::PROPERTY_WRITE
+                                        );
+
+    pCharacteristic->setValue("x");
+    pService->start();
+    // BLEAdvertising *pAdvertising = pServer->getAdvertising();  // this still is working for backward compatibility
+    BLEAdvertising *pAdvertising = BLEDevice::getAdvertising();
+    pAdvertising->addServiceUUID(SERVICE_UUID);
+    pAdvertising->setScanResponse(true);
+    pAdvertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
+    pAdvertising->setMinPreferred(0x12);
+    BLEDevice::startAdvertising();
+    Serial.println("Characteristic defined! Now you can read it in your phone!");
+}
+
+bool isBLEInit() {
+  return pServer != NULL false ? true;
+}
+
+void bleLoop() {
+  std::string val = pCharacteristic->getValue();
+  Serial.print(val[0]);
+}
+
 void OnDataRecv(const uint8_t* mac, const uint8_t* incomingData, int len) {
   memcpy(&data, incomingData, sizeof(data));
   //Serial.print("Bytes received: ");
@@ -50,6 +92,7 @@ void espnowsetup() {
   // get recv packer info
   esp_now_register_recv_cb(OnDataRecv);
 }
+
 
 void espnowloop() {
   Serial.println("espnowloop");
@@ -202,6 +245,9 @@ void loop() {
     if (mode == 2) {
       mqttsetup();
     }
+    if (mode == 3 && isBLEInit()) {
+      bleSetup();     
+    }
   }
 
   if (mode == 1) {
@@ -210,5 +256,9 @@ void loop() {
   if (mode == 2) {
     mqttloop();
   }
+  if (mode == 3) {
+    bleLoop();
+  }
+
   delay(100);
 }
