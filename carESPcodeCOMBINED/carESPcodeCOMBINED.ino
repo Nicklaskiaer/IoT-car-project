@@ -4,9 +4,18 @@
 #include <LiquidCrystal_I2C.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
+#include <HardwareSerial.h>
+
+#define R "72"
+#define F "66"
+#define L "6C"
+#define B "62"
+#define X "78"
+
 
 // Potentiometer is connected to GPIO 34 (Analog ADC1_CH6)
 const int potPin = 34;
+const int vout = 21;
 // variable for storing the potentiometer value
 int potValue = 0;
 // 1 = ESPNOW
@@ -17,6 +26,8 @@ int newmode = 0;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 uint8_t data;
 
+HardwareSerial loraSerial(2); // Enable UART2
+
 void OnDataRecv(const uint8_t* mac, const uint8_t* incomingData, int len) {
   memcpy(&data, incomingData, sizeof(data));
   //Serial.print("Bytes received: ");
@@ -26,9 +37,146 @@ void OnDataRecv(const uint8_t* mac, const uint8_t* incomingData, int len) {
   Serial.print((char)data);
 }
 
+void lora_autobaud()
+{
+  String response = "";
+  while (response=="")
+  {
+    delay(1000);
+    loraSerial.write((byte)0x00);
+    loraSerial.write(0x55);
+    loraSerial.println();
+    loraSerial.println("sys get ver");
+    response = loraSerial.readStringUntil('\n');
+  }
+}
+
+void loraSetup() {
+  pinMode(23, OUTPUT);
+
+  loraSerial.begin(57600);  // Serial communication to RN2483, default pins for UART2 RX->16 TX->17
+  loraSerial.setTimeout(1000);
+  lora_autobaud();
+  
+  digitalWrite(23, LOW);
+  delay(300);
+  digitalWrite(23, HIGH);
+
+  Serial.println("Initing LoRa");
+  
+  String str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  loraSerial.println("sys get ver");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  
+  loraSerial.println("mac pause");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  
+//  loraSerial.println("radio set bt 0.5");
+//  wait_for_ok();
+  
+  loraSerial.println("radio set mod lora");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  
+  loraSerial.println("radio set freq 868000000");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  
+  loraSerial.println("radio set pwr 14");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  
+  loraSerial.println("radio set sf sf7");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  
+  loraSerial.println("radio set afcbw 41.7");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  
+  loraSerial.println("radio set rxbw 20.8");  // Receiver bandwidth can be adjusted here. Lower BW equals better link budget / SNR (less noise). 
+  str = loraSerial.readStringUntil('\n');   // However, the system becomes more sensitive to frequency drift (due to temp) and PPM crystal inaccuracy. 
+  Serial.println(str);
+  
+//  loraSerial.println("radio set bitrate 50000");
+//  wait_for_ok();
+  
+//  loraSerial.println("radio set fdev 25000");
+//  wait_for_ok();
+  
+  loraSerial.println("radio set prlen 8");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  
+  loraSerial.println("radio set crc on");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  
+  loraSerial.println("radio set iqi off");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  
+  loraSerial.println("radio set cr 4/5"); // Maximum reliability is 4/8 ~ overhead ratio of 2.0
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  
+  loraSerial.println("radio set wdt 60000"); //disable for continuous reception
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  
+  loraSerial.println("radio set sync 12");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  
+  loraSerial.println("radio set bw 125");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+}
+
+void loraLoop() {
+  loraSerial.println("radio rx 0"); //wait for 60 seconds to receive
+  String str = loraSerial.readStringUntil('\n');
+  delay(20);
+  if ( str.indexOf("ok") == 0 )
+  {
+    String str_data = String("");
+    // This is blocking call
+    while(str_data=="")
+    {
+      str_data = loraSerial.readStringUntil('\n');
+    }
+    
+    if ( str_data.indexOf("radio_rx") == 0 )  //checking if data was reeived (equals radio_rx = <data>). indexOf returns position of "radio_rx"
+    { 
+      if (str_data.indexOf(R) != -1) {
+        Serial.print("r");
+      }
+
+      if (str_data.indexOf(L) != -1) {
+        Serial.print("l");
+      }
+
+      if (str_data.indexOf(F) != -1) {
+        Serial.print("f");
+      }
+
+      if (str_data.indexOf(B) != -1) {
+        Serial.print("b");
+      }
+    }
+  }
+  else
+  {
+    delay(2000);
+  }
+}
+
 void espnowsetup() {
   Serial.println("espnowsetup");
-  lcd.begin();
+  // lcd.begin();
   delay(500);
   lcd.backlight();
   lcd.setCursor(0, 0);
@@ -186,29 +334,40 @@ void mqttloop() {
 //------------------------------------YEAH-------------------------------------------
 
 void setup() {
-
+  pinMode(vout, OUTPUT);
+  digitalWrite(vout, HIGH);
   Serial.begin(9600);
+  loraSetup();
 }
 
 void loop() {
   potValue = analogRead(potPin);
   int newmode = map(potValue, 0, 4095, 1, 5);
 
-  if (mode != newmode) {
-    mode = newmode;
-    if (mode == 1) {
-      espnowsetup();
-    }
-    if (mode == 2) {
-      mqttsetup();
-    }
-  }
+  // if (mode != newmode) {
+  //   mode = newmode;
+  //   if (mode == 1) {
+  //     espnowsetup();
+  //   }
+  //   if (mode == 2) {
+  //     mqttsetup();
+  //   }
+  //   if (mode == 3) {
+  //     loraSetup();
+  //   }
+  // }
 
-  if (mode == 1) {
-    espnowloop();
-  }
-  if (mode == 2) {
-    mqttloop();
-  }
-  delay(100);
+  // if (mode == 1) {
+  //   espnowloop();
+  // }
+  // if (mode == 2) {
+  //   mqttloop();
+  // }
+  // if (mode == 3) {
+  //   loraLoop();
+  // }
+
+  loraLoop();
+
+  delay(10);
 }
