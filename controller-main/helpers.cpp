@@ -6,8 +6,11 @@ int valueX = 0; // to store the X-axis value
 int valueY = 0; // to store the Y-axis value
 
 // Wifi credentials
-const char *ssid = "PET lyttevogn 2";
-const char *password = "xind4201";
+const char *ssid = "Nicklas - iPhone";
+const char *password = "mki123mki";
+
+// Screen variables
+LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 /*
 Function that computes the direction the joystick is pointed to.
@@ -100,3 +103,67 @@ char nextMode(char currentMode, char *modeArray)
         return modeArray[i +1];
     }
 }
+
+bool initLCD(){
+  lcd.begin(0x27, 16, 2);
+  delay(250);
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("Initializing");
+  lcd.setCursor(0, 1);
+  lcd.print(".");
+  lcd.display();
+  return true;
+}
+
+/*
+Function that updates the LCD screen for the controller to fit with the currently used protocol.
+*/
+bool updateScreen(char currentMode){
+  if (currentMode == 'E') {
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Running");
+      lcd.setCursor(0, 1);
+      lcd.print("ESP NOW");
+      lcd.display();
+    }
+    if (currentMode == 'L') {
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Running");
+      lcd.setCursor(0, 1);
+      lcd.print("LoRa");
+      lcd.display();
+    }
+    if (currentMode == 'M') {
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Running");
+      lcd.setCursor(0, 1);
+      lcd.print("MQTT");
+      lcd.display();
+    }
+    if (currentMode == 'U') {
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Running");
+      lcd.setCursor(0, 1);
+      lcd.print("UDP");
+      lcd.display();
+    }
+    if (currentMode == 'B') {
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Running");
+      lcd.setCursor(0, 1);
+      lcd.print("BLE");
+      lcd.display();
+    }
+    return true;
+  }

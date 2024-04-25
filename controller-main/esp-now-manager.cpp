@@ -28,7 +28,7 @@ bool sendDirectionOnESPNow(char direction)
     esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&direction, sizeof(direction));
     if (result == ESP_OK)
     {
-        Serial.println("Sent with success");
+        Serial.print("Sent with success: ");
         Serial.println(direction);
 
         return true;

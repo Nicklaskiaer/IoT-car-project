@@ -119,25 +119,15 @@ bool sendDirectionOnLoRa(char direction)
     loraSerial.print("radio tx ");
     loraSerial.println("78"); // x
   }
+  Serial.print("Sent direction: ");
+  Serial.println(direction);
   
-
-  // loraSerial.print("radio tx ");
-  // loraSerial.println("66"); // F
-  // delay(50);
-  // loraSerial.print("radio tx ");
-  // loraSerial.println("62"); // B
-  // delay(50);
-  // loraSerial.print("radio tx ");
-  // loraSerial.println("6C"); // L
-  // delay(50);
-  // loraSerial.print("radio tx ");
-  // loraSerial.println("72"); // R
-
   // loraSerial.println(packageID);
   // str = loraSerial.readStringUntil('\n');
   // Serial.println(str);
   // str = loraSerial.readStringUntil('\n');
   // Serial.println(str);
+
   delay(50);
   packageID = packageID + 1;
   return true;
