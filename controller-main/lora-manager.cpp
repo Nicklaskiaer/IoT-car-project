@@ -99,24 +99,46 @@ bool sendDirectionOnLoRa(char direction)
   Serial.print("packageID = ");
   Serial.println(packageID);
 
-  loraSerial.print("radio tx ");
-  loraSerial.println("66"); // F
-  delay(50);
-  loraSerial.print("radio tx ");
-  loraSerial.println("62"); // B
-  delay(50);
-  loraSerial.print("radio tx ");
-  loraSerial.println("6C"); // L
-  delay(50);
-  loraSerial.print("radio tx ");
-  loraSerial.println("72"); // R
+  if (direction == 'f') {
+    loraSerial.print("radio tx ");
+    loraSerial.println("66"); // f
+  }
+  else if (direction == 'b') {
+    loraSerial.print("radio tx ");
+    loraSerial.println("62"); // b
+  }
+  else if (direction == 'l') {
+    loraSerial.print("radio tx ");
+    loraSerial.println("6C"); // l
+  }
+  else if (direction == 'r') {
+    loraSerial.print("radio tx ");
+    loraSerial.println("72"); // r
+  }
+  else if (direction == 'x') {
+    loraSerial.print("radio tx ");
+    loraSerial.println("78"); // x
+  }
+  
+
+  // loraSerial.print("radio tx ");
+  // loraSerial.println("66"); // F
+  // delay(50);
+  // loraSerial.print("radio tx ");
+  // loraSerial.println("62"); // B
+  // delay(50);
+  // loraSerial.print("radio tx ");
+  // loraSerial.println("6C"); // L
+  // delay(50);
+  // loraSerial.print("radio tx ");
+  // loraSerial.println("72"); // R
 
   // loraSerial.println(packageID);
-  str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
-  str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
-  delay(100);
+  // str = loraSerial.readStringUntil('\n');
+  // Serial.println(str);
+  // str = loraSerial.readStringUntil('\n');
+  // Serial.println(str);
+  delay(50);
   packageID = packageID + 1;
   return true;
 }

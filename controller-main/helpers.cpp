@@ -6,8 +6,8 @@ int valueX = 0; // to store the X-axis value
 int valueY = 0; // to store the Y-axis value
 
 // Wifi credentials
-const char *ssid = "Nicklas - iPhone";
-const char *password = "mki123mki";
+const char *ssid = "PET lyttevogn 2";
+const char *password = "xind4201";
 
 /*
 Function that computes the direction the joystick is pointed to.
