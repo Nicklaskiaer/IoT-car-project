@@ -334,7 +334,6 @@ void setup() {
   lcd.setCursor(0, 1);
   lcd.print(".");
   lcd.display();
-  Serial.println("1");
 }
 
 void loop() {
@@ -344,7 +343,6 @@ void loop() {
   if (mode != newmode) {
     mode = newmode;
     if (mode == 1) {
-      Serial.println("2");
       lcd.clear();
       delay(50);
       lcd.setCursor(0, 0);
@@ -360,10 +358,8 @@ void loop() {
       lcd.setCursor(0, 1);
       lcd.print("ESP NOW");
       lcd.display();
-      Serial.println("3");
     }
     if (mode == 2) {
-      Serial.println("4");
       lcd.clear();
       delay(50);
       lcd.setCursor(0, 0);
@@ -379,13 +375,33 @@ void loop() {
       lcd.setCursor(0, 1);
       lcd.print("MQTT");
       lcd.display();
-      Serial.println("5");
     }
     if (mode == 3) {
       //blesetup();
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("BLE NOT YET");
+      lcd.setCursor(0, 1);
+      lcd.print("IMPLEMENTED");
+      lcd.display();
     }
     if (mode == 4) {
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Initializing");
+      lcd.setCursor(0, 1);
+      lcd.print("Lora");
+      lcd.display();
       lorasetup();
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Running");
+      lcd.setCursor(0, 1);
+      lcd.print("Lora");
+      lcd.display();
     }
   }
 
