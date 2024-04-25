@@ -10,7 +10,6 @@ char currentMode = modeArray[0];
 void setup()
 {
     WiFi.disconnect();
-    loraSerial.
     Serial.begin(9600);
 
     initModeSelector();
