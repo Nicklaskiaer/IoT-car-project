@@ -18,6 +18,7 @@ void setup()
     else if (MODE == "LORA")
     {
         // Initialize LoRa
+        initLoRa();
     }
     else if (MODE == "MQTT")
     {
@@ -28,7 +29,6 @@ void setup()
     {
         // Initialize UDP
         initUDP();
-        Serial.print("INIT has been run");
     }
     else
     {
@@ -38,8 +38,6 @@ void setup()
 
 void loop()
 {
-
-    Serial.print("In loop");
     // Read the values of the X and Y pins
     int valueX = analogRead(VRX_PIN);
     int valueY = analogRead(VRY_PIN);
@@ -61,6 +59,15 @@ void loop()
     }
     else if (MODE == "LORA")
     {
+        // Send the direction using LoRa
+        if (sendDirectionOnLoRa(direction))
+        {
+            Serial.println("Direction sent successfully");
+        }
+        else
+        {
+            Serial.println("Failed to send direction");
+        }
     }
     else if (MODE == "MQTT")
     {
