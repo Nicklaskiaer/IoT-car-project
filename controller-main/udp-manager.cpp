@@ -2,7 +2,7 @@
 
 WiFiUDP udp;
 const char *udpAddress = "172.20.10.3"; // Example IP address of the receiver
-const int udpPort = 9999;                 // Example UDP port
+const int udpPort = 2390;               // Example UDP port
 
 /*
 Function that sends the direction over UDP.
@@ -36,7 +36,5 @@ bool initUDP()
     }
     else{
       Serial.print("Error beginning UDP");
-    } // Start listening for incoming data
-    Serial.print("udp.begin has been run");
-    sendDirectionOnUDP('b');
+    }
 }

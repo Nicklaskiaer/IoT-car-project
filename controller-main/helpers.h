@@ -2,6 +2,7 @@
 #define HELPERS_H
 
 #include <WiFi.h>
+#include <LiquidCrystal_I2C.h>
 
 #define BUTTON_PIN 4
 #define VRX_PIN 34 // GPIO34 -- X direction
@@ -15,5 +16,7 @@ bool displayProtocol();
 bool initModeSelector();
 bool buttonPushed();
 char nextMode(char currentMode, char *modeArray);
+bool updateScreen(char currentMode);
+bool initLCD();
 
 #endif

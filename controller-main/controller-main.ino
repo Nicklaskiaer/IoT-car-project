@@ -4,18 +4,17 @@
 #include "udp-manager.h"
 #include "helpers.h"
 
-char modeArray[5] = {'E', 'L', 'M', 'U', 'B'};
+char modeArray[5] = {'E', 'L', 'M', 'U'};
 char currentMode = modeArray[0];
 
 void setup()
 {
     WiFi.disconnect();
     Serial.begin(9600);
-
     initModeSelector();
-    Serial.print("\nNew mode selected: ");
+    initLCD();
+    Serial.print("\nChanged mode to: ");
     Serial.println(currentMode);
-
 
     if (currentMode == 'E')
     {
@@ -35,16 +34,11 @@ void setup()
     else if (currentMode == 'U')
     {
         // Initialize UDP
-        // initUDP();
-    }
-    else if (currentMode == 'B')
-    {
-        // Initialize BLE
-        // initBLE();
+        initUDP();
     }
     else
     {
-        Serial.print("ERROR: mode not recognised.");
+        Serial.println("ERROR: mode not recognised.");
     }
 }
 
@@ -52,10 +46,9 @@ void loop()
 {
     if (digitalRead(BUTTON_PIN) == HIGH)
     {
-        Serial.print("Button pushed");
+        Serial.println("Changing mode...");
         currentMode = nextMode(currentMode, modeArray);
-        Serial.print("Mode changed to: ");
-        Serial.println(currentMode);
+        updateScreen(currentMode);
         delay(2000);
         // Run the setup function again to reinitialize the selected mode
         setup();
@@ -107,26 +100,14 @@ void loop()
     else if (currentMode == 'U')
     {
         // Send the direction using UDP
-        // if (sendDirectionOnUDP(direction))
-        // {
-        //     Serial.println("Direction sent successfully");
-        // }
-        // else
-        // {
-        //     Serial.println("Failed to send direction");
-        // }
-    }
-    else if (currentMode == 'B')
-    {
-        // Send the direction using BLE
-        // if (sendDirectionOnUDP(direction))
-        // {
-        //     Serial.println("Direction sent successfully");
-        // }
-        // else
-        // {
-        //     Serial.println("Failed to send direction");
-        // }
+        if (sendDirectionOnUDP(direction))
+        {
+            Serial.println("Direction sent successfully");
+        }
+        else
+        {
+            Serial.println("Failed to send direction");
+        }
     }
     delay(100);
 }
