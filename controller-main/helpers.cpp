@@ -45,6 +45,7 @@ Connects the esp to the defined wifi.
 */
 void setupWifi()
 {
+
     delay(10);
     Serial.print("\nConnecting to ");
     Serial.println(ssid);
@@ -63,5 +64,39 @@ void setupWifi()
     Serial.println(WiFi.localIP());
 }
 
-bool changeProtocol();
-bool displayProtocol();
+bool initModeSelector()
+{
+    // Set the button pin as input
+    pinMode(BUTTON_PIN, INPUT);
+    return true;
+}
+
+bool buttonPushed()
+{
+    if (true)
+    {
+        return true;
+    }
+    return false;
+}
+
+/*
+Function that changes the current mode to the next mode in the mode array
+Returns a pointer to the new node.
+*/
+char nextMode(char currentMode, char *modeArray)
+{
+    int i = 0;
+    while (modeArray[i] != currentMode)
+    {
+        i++;
+    }
+    if (i == 4)
+    {
+        return modeArray[0];
+    }
+    else
+    {
+        return modeArray[i +1];
+    }
+}

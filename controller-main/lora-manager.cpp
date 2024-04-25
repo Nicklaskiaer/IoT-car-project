@@ -10,7 +10,6 @@ HardwareSerial loraSerial(2);
 
 bool initLoRa()
 {
-
   loraSerial.begin(56700); // This sets the Lora baudrate to 57600 with the
   // correct settings: 8 bit, no flow control and 1 stop bit, and uses UART2
   loraSerial.setTimeout(1000);
@@ -18,7 +17,7 @@ bool initLoRa()
   digitalWrite(RST, LOW);
   delay(200);
   digitalWrite(RST, HIGH);
-  lora_autobaud(); // Automaticly select the correct baudrate by sending a sequence of known data.
+  // lora_autobaud(); // Automaticly select the correct baudrate by sending a sequence of known data.
 
   Serial.println("Initing LoRa");
 
@@ -127,7 +126,6 @@ void lora_autobaud()
   String response = "";
   while (response == "")
   {
-    delay(1000);
     loraSerial.write(0x00);
     loraSerial.write(0x55);
     loraSerial.println();
