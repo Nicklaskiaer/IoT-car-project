@@ -1,0 +1,33 @@
+10:23:23.251 -> Message counter: 7
+10:23:24.228 -> f
+10:23:24.228 -> Message counter: 8
+10:23:25.244 -> f
+10:23:25.244 -> Message counter: 9
+10:23:26.217 -> f
+10:23:26.217 -> Message counter: 10
+10:23:27.226 -> f
+10:23:27.226 -> Message counter: 11
+10:23:28.223 -> f
+10:23:28.223 -> Message counter: 12
+10:23:29.227 -> f
+10:23:29.227 -> Message counter: 13
+10:23:30.255 -> f
+10:23:30.255 -> Message counter: 14
+10:23:31.230 -> f
+10:23:31.230 -> Message counter: 15
+10:23:32.216 -> f
+10:23:32.216 -> Message counter: 16
+10:23:33.229 -> f
+10:23:33.229 -> Message counter: 17
+10:23:34.220 -> f
+10:23:34.220 -> Message counter: 18
+10:23:35.221 -> f
+10:23:35.222 -> Message counter: 19
+10:23:36.252 -> f
+10:23:36.252 -> Message counter: 20
+10:23:37.224 -> f
+10:23:37.224 -> Message counter: 21
+10:23:38.225 -> f
+10:23:38.225 -> Message counter: 22
+10:23:39.219 -> f
+10:23:39.219 -> Message counter: 23
