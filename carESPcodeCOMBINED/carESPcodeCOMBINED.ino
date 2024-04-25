@@ -4,18 +4,163 @@
 #include <LiquidCrystal_I2C.h>
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
+#include <HardwareSerial.h>
 
+#define R "72"
+#define F "66"
+#define L "6C"
+#define B "62"
+#define X "78"
+//-----------------------------------LORA-----------------------------------------
 // Potentiometer is connected to GPIO 34 (Analog ADC1_CH6)
 const int potPin = 34;
+const int vout = 21;
 // variable for storing the potentiometer value
 int potValue = 0;
 // 1 = ESPNOW
 // 2 = MQTT
+// 3 = BLE
+// 4 = Lora
 int mode = 0;
 int newmode = 0;
-//-----------------------------------ESP NOW-----------------------------------------
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 uint8_t data;
+
+HardwareSerial loraSerial(2);  // Enable UART2
+
+void lora_autobaud() {
+  String response = "";
+  while (response == "") {
+    delay(1000);
+    loraSerial.write((byte)0x00);
+    loraSerial.write(0x55);
+    loraSerial.println();
+    loraSerial.println("sys get ver");
+    response = loraSerial.readStringUntil('\n');
+  }
+}
+
+void lorasetup() {
+  pinMode(23, OUTPUT);
+
+  loraSerial.begin(57600);  // Serial communication to RN2483, default pins for UART2 RX->16 TX->17
+  loraSerial.setTimeout(1000);
+  lora_autobaud();
+
+  digitalWrite(23, LOW);
+  delay(300);
+  digitalWrite(23, HIGH);
+
+  Serial.println("Initing LoRa");
+
+  String str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+  loraSerial.println("sys get ver");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+
+  loraSerial.println("mac pause");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+
+  //  loraSerial.println("radio set bt 0.5");
+  //  wait_for_ok();
+
+  loraSerial.println("radio set mod lora");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+
+  loraSerial.println("radio set freq 868000000");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+
+  loraSerial.println("radio set pwr 14");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+
+  loraSerial.println("radio set sf sf7");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+
+  loraSerial.println("radio set afcbw 41.7");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+
+  loraSerial.println("radio set rxbw 20.8");  // Receiver bandwidth can be adjusted here. Lower BW equals better link budget / SNR (less noise).
+  str = loraSerial.readStringUntil('\n');     // However, the system becomes more sensitive to frequency drift (due to temp) and PPM crystal inaccuracy.
+  Serial.println(str);
+
+  //  loraSerial.println("radio set bitrate 50000");
+  //  wait_for_ok();
+
+  //  loraSerial.println("radio set fdev 25000");
+  //  wait_for_ok();
+
+  loraSerial.println("radio set prlen 8");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+
+  loraSerial.println("radio set crc on");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+
+  loraSerial.println("radio set iqi off");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+
+  loraSerial.println("radio set cr 4/5");  // Maximum reliability is 4/8 ~ overhead ratio of 2.0
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+
+  loraSerial.println("radio set wdt 60000");  //disable for continuous reception
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+
+  loraSerial.println("radio set sync 12");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+
+  loraSerial.println("radio set bw 125");
+  str = loraSerial.readStringUntil('\n');
+  Serial.println(str);
+}
+
+void loraloop() {
+  loraSerial.println("radio rx 0");  //wait for 60 seconds to receive
+  String str = loraSerial.readStringUntil('\n');
+  delay(20);
+  if (str.indexOf("ok") == 0) {
+    String str_data = String("");
+    // This is blocking call
+    while (str_data == "") {
+      str_data = loraSerial.readStringUntil('\n');
+    }
+
+    if (str_data.indexOf("radio_rx") == 0)  //checking if data was reeived (equals radio_rx = <data>). indexOf returns position of "radio_rx"
+    {
+      if (str_data.indexOf(R) != -1) {
+        Serial.print("r");
+      }
+
+      if (str_data.indexOf(L) != -1) {
+        Serial.print("l");
+      }
+
+      if (str_data.indexOf(F) != -1) {
+        Serial.print("f");
+      }
+
+      if (str_data.indexOf(B) != -1) {
+        Serial.print("b");
+      }
+    }
+  } else {
+    delay(2000);
+  }
+}
+
+//-----------------------------------ESP NOW-----------------------------------------
+
 
 void OnDataRecv(const uint8_t* mac, const uint8_t* incomingData, int len) {
   memcpy(&data, incomingData, sizeof(data));
@@ -28,14 +173,6 @@ void OnDataRecv(const uint8_t* mac, const uint8_t* incomingData, int len) {
 
 void espnowsetup() {
   Serial.println("espnowsetup");
-  lcd.begin();
-  delay(500);
-  lcd.backlight();
-  lcd.setCursor(0, 0);
-  lcd.print("Hello");
-  lcd.setCursor(0, 1);
-  lcd.print("World");
-  lcd.display();
 
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
@@ -58,8 +195,8 @@ void espnowloop() {
 //------------------------------------MQTT-------------------------------------------
 
 /****** WiFi Connection Details *******/
-const char* ssid = "AndroidAP1063";
-const char* password = "alamakota123";
+const char* ssid = "PET lyttevogn 2";
+const char* password = "xind4201";
 
 /******* MQTT Broker Connection Details *******/
 const char* mqtt_server = "dfb0ec72cc864eddaee0fe147972f4af.s1.eu.hivemq.cloud";
@@ -183,24 +320,72 @@ void mqttloop() {
   delay(10);
 }
 
-//------------------------------------YEAH-------------------------------------------
+//------------------------------------OTHER-------------------------------------------
 
 void setup() {
 
   Serial.begin(9600);
+  delay(500);
+  lcd.begin();
+  delay(250);
+  lcd.backlight();
+  lcd.setCursor(0, 0);
+  lcd.print("Initializing");
+  lcd.setCursor(0, 1);
+  lcd.print(".");
+  lcd.display();
+  Serial.println("1");
 }
 
 void loop() {
   potValue = analogRead(potPin);
-  int newmode = map(potValue, 0, 4095, 1, 5);
+  int newmode = map(potValue, 0, 4095, 1, 4);
 
   if (mode != newmode) {
     mode = newmode;
     if (mode == 1) {
+      Serial.println("2");
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Initializing");
+      lcd.setCursor(0, 1);
+      lcd.print("ESP NOW");
+      lcd.display();
       espnowsetup();
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Running");
+      lcd.setCursor(0, 1);
+      lcd.print("ESP NOW");
+      lcd.display();
+      Serial.println("3");
     }
     if (mode == 2) {
+      Serial.println("4");
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Initializing");
+      lcd.setCursor(0, 1);
+      lcd.print("MQTT");
+      lcd.display();
       mqttsetup();
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Running");
+      lcd.setCursor(0, 1);
+      lcd.print("MQTT");
+      lcd.display();
+      Serial.println("5");
+    }
+    if (mode == 3) {
+      //blesetup();
+    }
+    if (mode == 4) {
+      lorasetup();
     }
   }
 
@@ -209,6 +394,12 @@ void loop() {
   }
   if (mode == 2) {
     mqttloop();
+  }
+  if (mode == 3) {
+    //bleloop();
+  }
+  if (mode == 4) {
+    loraloop();
   }
   delay(100);
 }
