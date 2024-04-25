@@ -104,7 +104,7 @@ void setup() {
 }
 
 void loop() {
-  led_on();
+
   Serial.print("packageID = ");
   Serial.println(packageID);
   loraSerial.print("radio tx ");
