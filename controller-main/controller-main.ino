@@ -36,6 +36,11 @@ void setup()
         // Initialize UDP
         initUDP();
     }
+    else if (currentMode == 'B')
+    {
+        // Initialize BLE
+        // initBLE();
+    }
     else
     {
         Serial.println("ERROR: mode not recognised.");
@@ -108,6 +113,18 @@ void loop()
         {
             Serial.println("Failed to send direction");
         }
+    }
+    else if (currentMode == 'B')
+    {
+        // Send the direction using BLE
+        // if (sendDirectionOnUDP(direction))
+        // {
+        //     Serial.println("Direction sent successfully");
+        // }
+        // else
+        // {
+        //     Serial.println("Failed to send direction");
+        // }
     }
     delay(100);
 }
