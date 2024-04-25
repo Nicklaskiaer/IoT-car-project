@@ -45,13 +45,13 @@ void lorasetup() {
 
   loraSerial.begin(57600);  // Serial communication to RN2483, default pins for UART2 RX->16 TX->17
   loraSerial.setTimeout(1000);
-  lora_autobaud();
+  //lora_autobaud();
 
   digitalWrite(23, LOW);
   delay(300);
   digitalWrite(23, HIGH);
 
-  Serial.println("Initing LoRa");
+  //Serial.println("Initing LoRa");
 
   String str = loraSerial.readStringUntil('\n');
   Serial.println(str);
@@ -172,14 +172,14 @@ void OnDataRecv(const uint8_t* mac, const uint8_t* incomingData, int len) {
 }
 
 void espnowsetup() {
-  Serial.println("espnowsetup");
+  //Serial.println("espnowsetup");
 
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
 
   // Init ESP-NOW
   if (esp_now_init() != ESP_OK) {
-    Serial.println("Error initializing ESP-NOW");
+    //Serial.println("Error initializing ESP-NOW");
     return;
   }
 
@@ -189,7 +189,7 @@ void espnowsetup() {
 }
 
 void espnowloop() {
-  Serial.println("espnowloop");
+  //Serial.println("espnowloop");
 }
 
 //------------------------------------MQTT-------------------------------------------
@@ -261,7 +261,7 @@ void setup_wifi() {
   }
 
   randomSeed(micros());
-  Serial.println("\nWiFi connected\nIP address: ");
+  //Serial.println("\nWiFi connected\nIP address: ");
   Serial.println(WiFi.localIP());
 }
 
@@ -277,13 +277,13 @@ void reconnect() {
 
     // Attempt to connect
     if (client.connect(clientId.c_str(), mqtt_username, mqtt_password)) {
-      Serial.println("connected");
+      //Serial.println("connected");
       client.subscribe(data_topic, 0);
 
     } else {
       Serial.print("failed, rc=");
       Serial.print(client.state());
-      Serial.println(" try again in 5 seconds");  // Wait 5 seconds before retrying
+      //Serial.println(" try again in 5 seconds");  // Wait 5 seconds before retrying
       delay(5000);
     }
   }
@@ -300,7 +300,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
 }
 
 void mqttsetup() {
-  Serial.println("mqttsetup");
+  //Serial.println("mqttsetup");
   while (!Serial) delay(10);
   setup_wifi();
 
@@ -312,7 +312,7 @@ void mqttsetup() {
 }
 
 void mqttloop() {
-  Serial.println("mqttloop");
+  //Serial.println("mqttloop");
   if (!client.connected())
     reconnect();  // check if client is connected
 
