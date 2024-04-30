@@ -37,4 +37,6 @@ bool initUDP()
     else{
       Serial.print("Error beginning UDP");
     }
+    return true;
+
 }
