@@ -23,7 +23,7 @@ int potValue = 0;
 // 3 = UDP
 // 4 = Lora
 int mode = 1;
-int changed = 1;
+bool changed = true;
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 uint8_t data;
@@ -279,7 +279,7 @@ void setup_wifi()
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
-    Serial.print(".");
+    // Serial.print(".");
   }
 
   randomSeed(micros());
@@ -295,7 +295,7 @@ void reconnect()
   while (!client.connected())
   {
 
-    Serial.print("Attempting MQTT connection...");
+    // Serial.print("Attempting MQTT connection...");
     String clientId = "car-test";
 
     // Attempt to connect
@@ -398,7 +398,7 @@ void loop()
   if (digitalRead(BUTTON) == HIGH)
   {
     delay(1000);
-    changed = 1;
+    changed = true;
     mode = mode + 1;
     if (mode > 4)
     {
@@ -483,7 +483,7 @@ void loop()
       lcd.print("Lora");
       lcd.display();
     }
-    changed = 0;
+    changed = false;
   }
   
 
