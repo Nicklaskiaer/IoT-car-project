@@ -60,41 +60,41 @@ void lorasetup()
   // Serial.println("Initing LoRa");
 
   String str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
   loraSerial.println("sys get ver");
   str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
 
   loraSerial.println("mac pause");
   str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
 
   //  loraSerial.println("radio set bt 0.5");
   //  wait_for_ok();
 
   loraSerial.println("radio set mod lora");
   str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
 
   loraSerial.println("radio set freq 868000000");
   str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
 
   loraSerial.println("radio set pwr 14");
   str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
 
   loraSerial.println("radio set sf sf7");
   str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
 
   loraSerial.println("radio set afcbw 41.7");
   str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
 
   loraSerial.println("radio set rxbw 20.8"); // Receiver bandwidth can be adjusted here. Lower BW equals better link budget / SNR (less noise).
   str = loraSerial.readStringUntil('\n');    // However, the system becomes more sensitive to frequency drift (due to temp) and PPM crystal inaccuracy.
-  Serial.println(str);
+  // Serial.println(str);
 
   //  loraSerial.println("radio set bitrate 50000");
   //  wait_for_ok();
@@ -104,31 +104,31 @@ void lorasetup()
 
   loraSerial.println("radio set prlen 8");
   str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
 
   loraSerial.println("radio set crc on");
   str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
 
   loraSerial.println("radio set iqi off");
   str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
 
   loraSerial.println("radio set cr 4/5"); // Maximum reliability is 4/8 ~ overhead ratio of 2.0
   str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
 
   loraSerial.println("radio set wdt 60000"); // disable for continuous reception
   str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
 
   loraSerial.println("radio set sync 12");
   str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
 
   loraSerial.println("radio set bw 125");
   str = loraSerial.readStringUntil('\n');
-  Serial.println(str);
+  // Serial.println(str);
 }
 
 void loraloop()
@@ -269,8 +269,8 @@ void setup_wifi()
 {
 
   delay(10);
-  Serial.print("\nConnecting to ");
-  Serial.println(ssid);
+  // Serial.print("\nConnecting to ");
+  // Serial.println(ssid);
 
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -283,7 +283,7 @@ void setup_wifi()
 
   randomSeed(micros());
   // Serial.println("\nWiFi connected\nIP address: ");
-  Serial.println(WiFi.localIP());
+  // Serial.println(WiFi.localIP());
 }
 
 /************* Connect to MQTT Broker ***********/
@@ -305,8 +305,8 @@ void reconnect()
     }
     else
     {
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
+      // Serial.print("failed, rc=");
+      // Serial.print(client.state());
       // Serial.println(" try again in 5 seconds");  // Wait 5 seconds before retrying
       delay(5000);
     }
