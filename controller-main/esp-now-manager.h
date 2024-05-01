@@ -3,6 +3,7 @@
 
 #include <esp_now.h>
 #include <WiFi.h>
+#include "helpers.h"
 
 
 bool sendDirectionOnESPNow(char direction);

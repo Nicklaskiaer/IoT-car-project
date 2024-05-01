@@ -2,6 +2,7 @@
 #define LORA_MANAGER_H
 
 #include <HardwareSerial.h>
+#include "helpers.h"
 
 bool initLoRa();
 bool sendDirectionOnLoRa(char direction);

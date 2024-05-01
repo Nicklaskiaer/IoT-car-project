@@ -94,7 +94,7 @@ char nextMode(char currentMode, char *modeArray)
     {
         i++;
     }
-    if (i == 4)
+    if (i == 3)
     {
         return modeArray[0];
     }
@@ -105,7 +105,7 @@ char nextMode(char currentMode, char *modeArray)
 }
 
 bool initLCD(){
-  lcd.begin(0x27, 16, 2);
+  lcd.begin();
   delay(250);
   lcd.backlight();
   lcd.setCursor(0, 0);
@@ -156,14 +156,5 @@ bool updateScreen(char currentMode){
       lcd.print("UDP");
       lcd.display();
     }
-    if (currentMode == 'B') {
-      lcd.clear();
-      delay(50);
-      lcd.setCursor(0, 0);
-      lcd.print("Running");
-      lcd.setCursor(0, 1);
-      lcd.print("BLE");
-      lcd.display();
-    }
     return true;
-  }
+}

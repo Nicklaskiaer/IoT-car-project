@@ -111,6 +111,7 @@ Function that initializes the MQTT connection.
 */
 bool initMQTT()
 {
+    updateScreen('M');
     setupWifi();
     
     // If we do not want to use the rootCA, uncommet the line underneath.

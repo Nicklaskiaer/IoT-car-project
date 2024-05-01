@@ -156,7 +156,7 @@ void loraloop() {
       }
     }
   } else {
-    delay(2000);
+    delay(5);
   }
 }
 
@@ -196,8 +196,8 @@ void espnowloop() {
 //------------------------------------MQTT-------------------------------------------
 
 /****** WiFi Connection Details *******/
-const char* ssid = "PET lyttevogn 2";
-const char* password = "xind4201";
+const char* ssid = "POCO X3 NFC";
+const char* password = "Kodeord1234";
 
 /******* MQTT Broker Connection Details *******/
 const char* mqtt_server = "dfb0ec72cc864eddaee0fe147972f4af.s1.eu.hivemq.cloud";
@@ -258,7 +258,7 @@ void setup_wifi() {
 
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
+    // Serial.print(".");
   }
 
   randomSeed(micros());
@@ -363,7 +363,7 @@ void setup() {
 
 void loop() {
   potValue = analogRead(potPin);
-  int newmode = map(potValue, 0, 4095, 1, 5);
+  int newmode = map(potValue, 0, 4095, 1, 4);
 
   if (mode != newmode) {
     mode = newmode;
@@ -402,13 +402,20 @@ void loop() {
       lcd.display();
     }
     if (mode == 3) {
-      //blesetup();
       lcd.clear();
       delay(50);
       lcd.setCursor(0, 0);
-      lcd.print("BLE NOT YET");
+      lcd.print("Initializing");
       lcd.setCursor(0, 1);
-      lcd.print("IMPLEMENTED");
+      lcd.print("UDP");
+      lcd.display();
+      udpSetup();
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Running");
+      lcd.setCursor(0, 1);
+      lcd.print("UDP");
       lcd.display();
     }
     if (mode == 4) {
@@ -428,23 +435,6 @@ void loop() {
       lcd.print("Lora");
       lcd.display();
     }
-    if (mode == 5) {
-      lcd.clear();
-      delay(50);
-      lcd.setCursor(0, 0);
-      lcd.print("Initializing");
-      lcd.setCursor(0, 1);
-      lcd.print("UDP");
-      lcd.display();
-      udpSetup();
-      lcd.clear();
-      delay(50);
-      lcd.setCursor(0, 0);
-      lcd.print("Running");
-      lcd.setCursor(0, 1);
-      lcd.print("UDP");
-      lcd.display();
-    }
   }
 
   if (mode == 1) {
@@ -454,13 +444,9 @@ void loop() {
     mqttloop();
   }
   if (mode == 3) {
-    //bleloop();
+    udpLoop();
   }
   if (mode == 4) {
     loraloop();
   }
-  if (mode == 5) {
-    udpLoop();
-  }
-  delay(100);
 }

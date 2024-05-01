@@ -10,6 +10,7 @@ HardwareSerial loraSerial(2);
 
 bool initLoRa()
 {
+  updateScreen('L');
   loraSerial.begin(56700); // This sets the Lora baudrate to 57600 with the
   // correct settings: 8 bit, no flow control and 1 stop bit, and uses UART2
   loraSerial.setTimeout(1000);
