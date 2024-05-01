@@ -2,6 +2,12 @@
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
 
+/****** Joystick Details ******/
+#define VRX_PIN  34
+#define VRY_PIN  35
+int valueX = 0; // to store the X-axis value
+int valueY = 0; // to store the Y-axis value
+const char* direction;
 
 /****** WiFi Connection Details *******/
 const char* ssid = "AndroidAP1063";
@@ -118,6 +124,24 @@ void publishMessage(const char* topic, const char * payload , boolean retained){
 }
 
 
+/****** Joystick reader ******/ 
+const char* getCharDirection(int x, int y){
+  if (x > 2000 && (y < 3000 && y > 1000)){
+    return "f";
+  }
+  if (x < 1000 && (y < 3000 && y > 1000)){
+    return "b";
+  }
+  if (y < 1100 && (x < 2000 && x > 1000)){
+    return "r";
+  }
+  if (y > 2500 && (x < 2000 && x > 1000)){
+    return "l";
+  }
+  return "x";
+}
+
+
 void setup() {
   // initialize digital pin LED_BUILTIN as an output.
 
@@ -141,10 +165,21 @@ void loop() {
   
   client.loop();
 
-  const char * message = "Test"; 
+  //const char * message = "Test"; 
 
-  publishMessage("car_data", message, true);
+  valueX = analogRead(VRX_PIN);
+  valueY = analogRead(VRY_PIN);
 
-  delay(10000);
+  Serial.print("X value");
+  Serial.println(valueX);
+  Serial.print("Y value");
+  Serial.println(valueY);
+
+  direction = getCharDirection(valueX, valueY);
+
+  publishMessage("car_data", direction, true);
+
+
+  delay(1000);
 
 }
