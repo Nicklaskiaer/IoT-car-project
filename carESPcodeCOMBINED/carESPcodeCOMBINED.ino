@@ -459,6 +459,8 @@ void loop() {
   if (mode == 4) {
     loraloop();
   }
-  if (mode == 5)
+  if (mode == 5) {
+    udpLoop();
+  }
   delay(100);
 }
