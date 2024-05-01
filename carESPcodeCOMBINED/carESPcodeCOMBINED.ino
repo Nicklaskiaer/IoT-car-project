@@ -14,7 +14,7 @@
 #define X "78"
 //-----------------------------------LORA-----------------------------------------
 // Potentiometer is connected to GPIO 34 (Analog ADC1_CH6)
-const int potPin = 34;
+const int BUTTON = 34;
 const int vout = 21;
 // variable for storing the potentiometer value
 int potValue = 0;
@@ -22,8 +22,8 @@ int potValue = 0;
 // 2 = MQTT
 // 3 = BLE
 // 4 = Lora
-int mode = 0;
-int newmode = 0;
+int mode = 1;
+int newmode = 1;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 uint8_t data;
 
@@ -393,6 +393,14 @@ void setup()
 
 void loop()
 {
+  if (digitalRead(BUTTON) == HIGH)
+  {
+    newmode = mode++;
+    if (newmode > 4)
+    {
+      newmode = 1;
+    }
+  }
   potValue = analogRead(potPin);
   int newmode = map(potValue, 0, 4095, 1, 5);
 
