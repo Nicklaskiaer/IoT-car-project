@@ -24,6 +24,8 @@ int potValue = 0;
 // 4 = Lora
 int mode = 1;
 int newmode = 1;
+int changed = 1;
+
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 uint8_t data;
 
@@ -378,6 +380,7 @@ void udpLoop()
 
 void setup()
 {
+  pinMode(BUTTON, INPUT);
   Serial.setTimeout(50);
   Serial.begin(9600);
   delay(500);
@@ -395,23 +398,22 @@ void loop()
 {
   if (digitalRead(BUTTON) == HIGH)
   {
-    newmode = mode++;
-    if (newmode > 4)
+    delay(1000);
+    changed = 1;
+    mode = mode + 1;
+    if (mode > 4)
     {
-      newmode = 1;
+      mode = 1;
     }
   }
-  potValue = analogRead(potPin);
-  int newmode = map(potValue, 0, 4095, 1, 5);
+  // potValue = analogRead(potPin);
+  // int newmode = map(potValue, 0, 4095, 1, 5);
 
   if (Serial.available())
   {
     sensors_data = Serial.readString();
   }
-
-  if (mode != newmode)
-  {
-    mode = newmode;
+  if (changed) {
     if (mode == 1)
     {
       lcd.clear();
@@ -495,7 +497,9 @@ void loop()
       lcd.print("UDP");
       lcd.display();
     }
+    changed = 0;
   }
+  
 
   if (mode == 1)
   {
