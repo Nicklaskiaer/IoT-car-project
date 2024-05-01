@@ -14,7 +14,7 @@
 #define X "78"
 //-----------------------------------LORA-----------------------------------------
 // Potentiometer is connected to GPIO 34 (Analog ADC1_CH6)
-const int potPin = 34;
+const int BUTTON = 34;
 const int vout = 21;
 // variable for storing the potentiometer value
 int potValue = 0;
@@ -23,15 +23,17 @@ int potValue = 0;
 // 3 = BLE
 // 4 = Lora
 int mode = 0;
-int newmode = 0;
+int newMode = 0;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 uint8_t data;
 
-HardwareSerial loraSerial(2);  // Enable UART2
+HardwareSerial loraSerial(2); // Enable UART2
 
-void lora_autobaud() {
+void lora_autobaud()
+{
   String response = "";
-  while (response == "") {
+  while (response == "")
+  {
     delay(1000);
     loraSerial.write((byte)0x00);
     loraSerial.write(0x55);
@@ -41,18 +43,19 @@ void lora_autobaud() {
   }
 }
 
-void lorasetup() {
+void lorasetup()
+{
   pinMode(23, OUTPUT);
 
-  loraSerial.begin(57600);  // Serial communication to RN2483, default pins for UART2 RX->16 TX->17
+  loraSerial.begin(57600); // Serial communication to RN2483, default pins for UART2 RX->16 TX->17
   loraSerial.setTimeout(1000);
-  //lora_autobaud();
+  // lora_autobaud();
 
   digitalWrite(23, LOW);
   delay(300);
   digitalWrite(23, HIGH);
 
-  //Serial.println("Initing LoRa");
+  // Serial.println("Initing LoRa");
 
   String str = loraSerial.readStringUntil('\n');
   Serial.println(str);
@@ -87,8 +90,8 @@ void lorasetup() {
   str = loraSerial.readStringUntil('\n');
   Serial.println(str);
 
-  loraSerial.println("radio set rxbw 20.8");  // Receiver bandwidth can be adjusted here. Lower BW equals better link budget / SNR (less noise).
-  str = loraSerial.readStringUntil('\n');     // However, the system becomes more sensitive to frequency drift (due to temp) and PPM crystal inaccuracy.
+  loraSerial.println("radio set rxbw 20.8"); // Receiver bandwidth can be adjusted here. Lower BW equals better link budget / SNR (less noise).
+  str = loraSerial.readStringUntil('\n');    // However, the system becomes more sensitive to frequency drift (due to temp) and PPM crystal inaccuracy.
   Serial.println(str);
 
   //  loraSerial.println("radio set bitrate 50000");
@@ -109,11 +112,11 @@ void lorasetup() {
   str = loraSerial.readStringUntil('\n');
   Serial.println(str);
 
-  loraSerial.println("radio set cr 4/5");  // Maximum reliability is 4/8 ~ overhead ratio of 2.0
+  loraSerial.println("radio set cr 4/5"); // Maximum reliability is 4/8 ~ overhead ratio of 2.0
   str = loraSerial.readStringUntil('\n');
   Serial.println(str);
 
-  loraSerial.println("radio set wdt 60000");  //disable for continuous reception
+  loraSerial.println("radio set wdt 60000"); // disable for continuous reception
   str = loraSerial.readStringUntil('\n');
   Serial.println(str);
 
@@ -126,61 +129,72 @@ void lorasetup() {
   Serial.println(str);
 }
 
-void loraloop() {
-  loraSerial.println("radio rx 0");  //wait for 60 seconds to receive
+void loraloop()
+{
+  loraSerial.println("radio rx 0"); // wait for 60 seconds to receive
   String str = loraSerial.readStringUntil('\n');
   delay(20);
-  if (str.indexOf("ok") == 0) {
+  if (str.indexOf("ok") == 0)
+  {
     String str_data = String("");
     // This is blocking call
-    while (str_data == "") {
+    while (str_data == "")
+    {
       str_data = loraSerial.readStringUntil('\n');
     }
 
-    if (str_data.indexOf("radio_rx") == 0)  //checking if data was reeived (equals radio_rx = <data>). indexOf returns position of "radio_rx"
+    if (str_data.indexOf("radio_rx") == 0) // checking if data was reeived (equals radio_rx = <data>). indexOf returns position of "radio_rx"
     {
-      if (str_data.indexOf(R) != -1) {
+      if (str_data.indexOf(R) != -1)
+      {
         Serial.print("r");
       }
 
-      if (str_data.indexOf(L) != -1) {
+      if (str_data.indexOf(L) != -1)
+      {
         Serial.print("l");
       }
 
-      if (str_data.indexOf(F) != -1) {
+      if (str_data.indexOf(F) != -1)
+      {
         Serial.print("f");
       }
 
-      if (str_data.indexOf(B) != -1) {
+      if (str_data.indexOf(B) != -1)
+      {
         Serial.print("b");
       }
     }
-  } else {
+  }
+  else
+  {
     delay(5);
   }
 }
 
 //-----------------------------------ESP NOW-----------------------------------------
 
-
-void OnDataRecv(const uint8_t* mac, const uint8_t* incomingData, int len) {
+void OnDataRecv(const uint8_t *mac, const uint8_t *incomingData, int len)
+{
   memcpy(&data, incomingData, sizeof(data));
-  //Serial.print("Bytes received: ");
-  //Serial.println(len);
-  //Serial.print("Int: ");
-  //Serial.println((char) data);
+  // Serial.print("Bytes received: ");
+  // Serial.println(len);
+  // Serial.print("Int: ");
+  // Serial.println((char) data);
   Serial.print((char)data);
 }
 
-void espnowsetup() {
-  //Serial.println("espnowsetup");
+void espnowsetup()
+{
+  // Serial.println("espnowsetup");
 
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
 
   // Init ESP-NOW
-  if (esp_now_init() != ESP_OK) {
-    //Serial.println("Error initializing ESP-NOW");
+  if (esp_now_init() != ESP_OK)
+  {
+    // Serial.println("Error initializing ESP-NOW");
     return;
   }
 
@@ -189,31 +203,32 @@ void espnowsetup() {
   esp_now_register_recv_cb(OnDataRecv);
 }
 
-void espnowloop() {
-  //Serial.println("espnowloop");
+void espnowloop()
+{
+  // Serial.println("espnowloop");
 }
 
 //------------------------------------MQTT-------------------------------------------
 
 /****** WiFi Connection Details *******/
-const char* ssid = "POCO X3 NFC";
-const char* password = "Kodeord1234";
+const char *ssid = "POCO X3 NFC";
+const char *password = "Kodeord1234";
 
 /******* MQTT Broker Connection Details *******/
-const char* mqtt_server = "dfb0ec72cc864eddaee0fe147972f4af.s1.eu.hivemq.cloud";
-const char* mqtt_username = "auto-car";
-const char* mqtt_password = "420Driving420";
+const char *mqtt_server = "dfb0ec72cc864eddaee0fe147972f4af.s1.eu.hivemq.cloud";
+const char *mqtt_username = "auto-car";
+const char *mqtt_password = "420Driving420";
 const int mqtt_port = 8883;
 
-const char* data_topic = "car_data";
-const char* latency_topic = "time/ack";
+const char *data_topic = "car_data";
+const char *latency_topic = "time/ack";
 
 WiFiClientSecure espClient;
 
 /**** MQTT Client Initialisation Using WiFi Connection *****/
 PubSubClient client(espClient);
 
-static const char* rootCA PROGMEM = R"EOF(
+static const char *rootCA PROGMEM = R"EOF(
 -----BEGIN CERTIFICATE-----
 MIIFazCCA1OgAwIBAgIRAIIQz7DSQONZRGPgu2OCiwAwDQYJKoZIhvcNAQELBQAw
 TzELMAkGA1UEBhMCVVMxKTAnBgNVBAoTIEludGVybmV0IFNlY3VyaXR5IFJlc2Vh
@@ -247,7 +262,8 @@ emyPxgcYxn/eR44/KJ4EBs+lVDR3veyJm+kXQ99b21/+jh5Xos1AnX5iItreGCc=
 -----END CERTIFICATE-----
 )EOF";
 
-void setup_wifi() {
+void setup_wifi()
+{
 
   delay(10);
   Serial.print("\nConnecting to ");
@@ -256,53 +272,61 @@ void setup_wifi() {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
 
-  while (WiFi.status() != WL_CONNECTED) {
+  while (WiFi.status() != WL_CONNECTED)
+  {
     delay(500);
     // Serial.print(".");
   }
 
   randomSeed(micros());
-  //Serial.println("\nWiFi connected\nIP address: ");
+  // Serial.println("\nWiFi connected\nIP address: ");
   Serial.println(WiFi.localIP());
 }
 
-
 /************* Connect to MQTT Broker ***********/
-void reconnect() {
+void reconnect()
+{
 
   // Loop until we're reconnected
-  while (!client.connected()) {
+  while (!client.connected())
+  {
 
     Serial.print("Attempting MQTT connection...");
     String clientId = "car-test";
 
     // Attempt to connect
-    if (client.connect(clientId.c_str(), mqtt_username, mqtt_password)) {
-      //Serial.println("connected");
+    if (client.connect(clientId.c_str(), mqtt_username, mqtt_password))
+    {
+      // Serial.println("connected");
       client.subscribe(data_topic, 0);
-
-    } else {
+    }
+    else
+    {
       Serial.print("failed, rc=");
       Serial.print(client.state());
-      //Serial.println(" try again in 5 seconds");  // Wait 5 seconds before retrying
+      // Serial.println(" try again in 5 seconds");  // Wait 5 seconds before retrying
       delay(5000);
     }
   }
 }
 
 /***** Call back Method for Receiving MQTT messages****/
-void callback(char* topic, byte* payload, unsigned int length) {
+void callback(char *topic, byte *payload, unsigned int length)
+{
 
   String incommingMessage = "";
-  for (int i = 0; i < length; i++) incommingMessage += (char)payload[i];
-  //Serial.println("Message arrived ["+String(topic)+"]"+incommingMessage);
+  for (int i = 0; i < length; i++)
+    incommingMessage += (char)payload[i];
+  // Serial.println("Message arrived ["+String(topic)+"]"+incommingMessage);
   Serial.print((char)payload[0]);
   client.publish(latency_topic, "ack");
 }
 
-void mqttsetup() {
-  //Serial.println("mqttsetup");
-  while (!Serial) delay(10);
+void mqttsetup()
+{
+  // Serial.println("mqttsetup");
+  while (!Serial)
+    delay(10);
   setup_wifi();
 
   // espClient.setInsecure();
@@ -312,23 +336,23 @@ void mqttsetup() {
   client.setCallback(callback);
 }
 
-void mqttloop() {
-  //Serial.println("mqttloop");
+void mqttloop()
+{
+  // Serial.println("mqttloop");
   if (!client.connected())
-    reconnect();  // check if client is connected
+    reconnect(); // check if client is connected
 
   client.loop();
   delay(10);
 }
-
 
 //------------------------------------UDP---------------------------------------------
 WiFiUDP udp;
 char packetBuffer[255];
 unsigned int localPort = 2390;
 
-
-void udpSetup() {
+void udpSetup()
+{
   setup_wifi();
 
   udp.begin(localPort);
@@ -336,10 +360,12 @@ void udpSetup() {
   // The controller will need the IP of car
 }
 
-void udpLoop() {
+void udpLoop()
+{
   int packetSize = udp.parsePacket();
 
-  if (packetSize) {
+  if (packetSize)
+  {
     int len = udp.read(packetBuffer, 255);
     Serial.print((char)packetBuffer[0]);
   }
@@ -347,8 +373,9 @@ void udpLoop() {
 
 //------------------------------------OTHER-------------------------------------------
 
-void setup() {
-
+void setup()
+{
+  pinMode(BUTTON, INPUT);
   Serial.begin(9600);
   delay(500);
   lcd.begin();
@@ -361,13 +388,24 @@ void setup() {
   lcd.display();
 }
 
-void loop() {
-  potValue = analogRead(potPin);
-  int newmode = map(potValue, 0, 4095, 1, 4);
+void loop()
+{
+  if (DIGITAL_READ(BUTTON) == HIGH)
+  {
+    newMode = mode++;
+    if (newMode > 4)
+    {
+      newMode = 1;
+    }
+  }
+  // potValue = analogRead(potPin);
+  // int newMode = map(potValue, 0, 4095, 1, 4);
 
-  if (mode != newmode) {
-    mode = newmode;
-    if (mode == 1) {
+  if (mode != newMode)
+  {
+    mode = newMode;
+    if (mode == 1)
+    {
       lcd.clear();
       delay(50);
       lcd.setCursor(0, 0);
@@ -384,7 +422,8 @@ void loop() {
       lcd.print("ESP NOW");
       lcd.display();
     }
-    if (mode == 2) {
+    if (mode == 2)
+    {
       lcd.clear();
       delay(50);
       lcd.setCursor(0, 0);
@@ -401,7 +440,8 @@ void loop() {
       lcd.print("MQTT");
       lcd.display();
     }
-    if (mode == 3) {
+    if (mode == 3)
+    {
       lcd.clear();
       delay(50);
       lcd.setCursor(0, 0);
@@ -418,7 +458,8 @@ void loop() {
       lcd.print("UDP");
       lcd.display();
     }
-    if (mode == 4) {
+    if (mode == 4)
+    {
       lcd.clear();
       delay(50);
       lcd.setCursor(0, 0);
@@ -437,16 +478,20 @@ void loop() {
     }
   }
 
-  if (mode == 1) {
+  if (mode == 1)
+  {
     espnowloop();
   }
-  if (mode == 2) {
+  if (mode == 2)
+  {
     mqttloop();
   }
-  if (mode == 3) {
+  if (mode == 3)
+  {
     udpLoop();
   }
-  if (mode == 4) {
+  if (mode == 4)
+  {
     loraloop();
   }
 }
