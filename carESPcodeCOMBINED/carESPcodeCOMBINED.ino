@@ -20,10 +20,9 @@ const int vout = 21;
 int potValue = 0;
 // 1 = ESPNOW
 // 2 = MQTT
-// 3 = BLE
+// 3 = UDP
 // 4 = Lora
 int mode = 1;
-int newmode = 1;
 int changed = 1;
 
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -215,8 +214,8 @@ void espnowloop()
 //------------------------------------MQTT-------------------------------------------
 
 /****** WiFi Connection Details *******/
-const char *ssid = "PET lyttevogn 2";
-const char *password = "xind4201";
+const char *ssid = "POCO X3 NFC";
+const char *password = "Kodeord1234";
 
 /******* MQTT Broker Connection Details *******/
 const char *mqtt_server = "dfb0ec72cc864eddaee0fe147972f4af.s1.eu.hivemq.cloud";
@@ -406,8 +405,6 @@ void loop()
       mode = 1;
     }
   }
-  // potValue = analogRead(potPin);
-  // int newmode = map(potValue, 0, 4095, 1, 5);
 
   if (Serial.available())
   {
@@ -452,13 +449,20 @@ void loop()
     }
     if (mode == 3)
     {
-      // blesetup();
       lcd.clear();
       delay(50);
       lcd.setCursor(0, 0);
-      lcd.print("BLE NOT YET");
+      lcd.print("Initializing");
       lcd.setCursor(0, 1);
-      lcd.print("IMPLEMENTED");
+      lcd.print("UDP");
+      lcd.display();
+      udpSetup();
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Running");
+      lcd.setCursor(0, 1);
+      lcd.print("UDP");
       lcd.display();
     }
     if (mode == 4)
@@ -479,24 +483,6 @@ void loop()
       lcd.print("Lora");
       lcd.display();
     }
-    if (mode == 5)
-    {
-      lcd.clear();
-      delay(50);
-      lcd.setCursor(0, 0);
-      lcd.print("Initializing");
-      lcd.setCursor(0, 1);
-      lcd.print("UDP");
-      lcd.display();
-      udpSetup();
-      lcd.clear();
-      delay(50);
-      lcd.setCursor(0, 0);
-      lcd.print("Running");
-      lcd.setCursor(0, 1);
-      lcd.print("UDP");
-      lcd.display();
-    }
     changed = 0;
   }
   
@@ -512,15 +498,10 @@ void loop()
   }
   if (mode == 3)
   {
-    // bleloop();
+    udpLoop();
   }
   if (mode == 4)
   {
     loraloop();
   }
-  if (mode == 5)
-  {
-    udpLoop();
-  }
-  delay(100);
 }
