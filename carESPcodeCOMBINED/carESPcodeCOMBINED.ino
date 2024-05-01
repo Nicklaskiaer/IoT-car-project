@@ -14,7 +14,7 @@
 #define X "78"
 //-----------------------------------LORA-----------------------------------------
 // Potentiometer is connected to GPIO 34 (Analog ADC1_CH6)
-const int BUTTON = 34;
+const int potPin = 34;
 const int vout = 21;
 // variable for storing the potentiometer value
 int potValue = 0;
@@ -23,9 +23,11 @@ int potValue = 0;
 // 3 = BLE
 // 4 = Lora
 int mode = 0;
-int newMode = 0;
+int newmode = 0;
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 uint8_t data;
+
+String sensors_data = "";
 
 HardwareSerial loraSerial(2); // Enable UART2
 
@@ -168,7 +170,7 @@ void loraloop()
   }
   else
   {
-    delay(5);
+    delay(2000);
   }
 }
 
@@ -211,8 +213,8 @@ void espnowloop()
 //------------------------------------MQTT-------------------------------------------
 
 /****** WiFi Connection Details *******/
-const char *ssid = "POCO X3 NFC";
-const char *password = "Kodeord1234";
+const char *ssid = "PET lyttevogn 2";
+const char *password = "xind4201";
 
 /******* MQTT Broker Connection Details *******/
 const char *mqtt_server = "dfb0ec72cc864eddaee0fe147972f4af.s1.eu.hivemq.cloud";
@@ -222,6 +224,7 @@ const int mqtt_port = 8883;
 
 const char *data_topic = "car_data";
 const char *latency_topic = "time/ack";
+const char *sensors_topic = "sensor_data";
 
 WiFiClientSecure espClient;
 
@@ -275,7 +278,7 @@ void setup_wifi()
   while (WiFi.status() != WL_CONNECTED)
   {
     delay(500);
-    // Serial.print(".");
+    Serial.print(".");
   }
 
   randomSeed(micros());
@@ -375,7 +378,7 @@ void udpLoop()
 
 void setup()
 {
-  pinMode(BUTTON, INPUT);
+  Serial.setTimeout(50);
   Serial.begin(9600);
   delay(500);
   lcd.begin();
@@ -390,20 +393,17 @@ void setup()
 
 void loop()
 {
-  if (DIGITAL_READ(BUTTON) == HIGH)
-  {
-    newMode = mode++;
-    if (newMode > 4)
-    {
-      newMode = 1;
-    }
-  }
-  // potValue = analogRead(potPin);
-  // int newMode = map(potValue, 0, 4095, 1, 4);
+  potValue = analogRead(potPin);
+  int newmode = map(potValue, 0, 4095, 1, 5);
 
-  if (mode != newMode)
+  if (Serial.available())
   {
-    mode = newMode;
+    sensors_data = Serial.readString();
+  }
+
+  if (mode != newmode)
+  {
+    mode = newmode;
     if (mode == 1)
     {
       lcd.clear();
@@ -442,20 +442,13 @@ void loop()
     }
     if (mode == 3)
     {
+      // blesetup();
       lcd.clear();
       delay(50);
       lcd.setCursor(0, 0);
-      lcd.print("Initializing");
+      lcd.print("BLE NOT YET");
       lcd.setCursor(0, 1);
-      lcd.print("UDP");
-      lcd.display();
-      udpSetup();
-      lcd.clear();
-      delay(50);
-      lcd.setCursor(0, 0);
-      lcd.print("Running");
-      lcd.setCursor(0, 1);
-      lcd.print("UDP");
+      lcd.print("IMPLEMENTED");
       lcd.display();
     }
     if (mode == 4)
@@ -476,6 +469,24 @@ void loop()
       lcd.print("Lora");
       lcd.display();
     }
+    if (mode == 5)
+    {
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Initializing");
+      lcd.setCursor(0, 1);
+      lcd.print("UDP");
+      lcd.display();
+      udpSetup();
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Running");
+      lcd.setCursor(0, 1);
+      lcd.print("UDP");
+      lcd.display();
+    }
   }
 
   if (mode == 1)
@@ -485,13 +496,19 @@ void loop()
   if (mode == 2)
   {
     mqttloop();
+    client.publish(sensors_topic, sensors_data.c_str());
   }
   if (mode == 3)
   {
-    udpLoop();
+    // bleloop();
   }
   if (mode == 4)
   {
     loraloop();
   }
+  if (mode == 5)
+  {
+    udpLoop();
+  }
+  delay(100);
 }
