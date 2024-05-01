@@ -5,6 +5,7 @@
 #include <PubSubClient.h>
 #include <WiFiClientSecure.h>
 #include <HardwareSerial.h>
+#include <WiFiUdp.h>
 
 #define R "72"
 #define F "66"
@@ -320,6 +321,30 @@ void mqttloop() {
   delay(10);
 }
 
+
+//------------------------------------UDP---------------------------------------------
+WiFiUDP udp;
+char packetBuffer[255];
+unsigned int localPort = 2390;
+
+
+void udpSetup() {
+  setup_wifi();
+
+  udp.begin(localPort);
+
+  // The controller will need the IP of car
+}
+
+void udpLoop() {
+  int packetSize = udp.parsePacket();
+
+  if (packetSize) {
+    int len = udp.read(packetBuffer, 255);
+    Serial.print((char)packetBuffer[0]);
+  }
+}
+
 //------------------------------------OTHER-------------------------------------------
 
 void setup() {
@@ -338,7 +363,7 @@ void setup() {
 
 void loop() {
   potValue = analogRead(potPin);
-  int newmode = map(potValue, 0, 4095, 1, 4);
+  int newmode = map(potValue, 0, 4095, 1, 5);
 
   if (mode != newmode) {
     mode = newmode;
@@ -403,6 +428,23 @@ void loop() {
       lcd.print("Lora");
       lcd.display();
     }
+    if (mode == 5) {
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Initializing");
+      lcd.setCursor(0, 1);
+      lcd.print("UDP");
+      lcd.display();
+      udpSetup();
+      lcd.clear();
+      delay(50);
+      lcd.setCursor(0, 0);
+      lcd.print("Running");
+      lcd.setCursor(0, 1);
+      lcd.print("UDP");
+      lcd.display();
+    }
   }
 
   if (mode == 1) {
@@ -416,6 +458,9 @@ void loop() {
   }
   if (mode == 4) {
     loraloop();
+  }
+  if (mode == 5) {
+    udpLoop();
   }
   delay(100);
 }

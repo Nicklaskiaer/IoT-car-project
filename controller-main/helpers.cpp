@@ -6,8 +6,8 @@ int valueX = 0; // to store the X-axis value
 int valueY = 0; // to store the Y-axis value
 
 // Wifi credentials
-const char *ssid = "Nicklas - iPhone";
-const char *password = "mki123mki";
+const char *ssid = "POCO X3 NFC";
+const char *password = "Kodeord1234";
 
 // Screen variables
 LiquidCrystal_I2C lcd(0x27, 16, 2);
