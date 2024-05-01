@@ -1,7 +1,7 @@
 #include "udp-manager.h"
 
 WiFiUDP udp;
-const char *udpAddress = "172.20.10.3"; // Example IP address of the receiver
+const char *udpAddress = "192.168.146.122"; // Example IP address of the receiver
 const int udpPort = 2390;               // Example UDP port
 
 /*
@@ -30,6 +30,7 @@ Function to initialize the UDP connection.
 */
 bool initUDP()
 {
+    updateScreen('U');
     setupWifi();
     if (udp.begin(udpPort)){
       Serial.print("Successfully began UDP");

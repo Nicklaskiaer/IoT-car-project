@@ -41,6 +41,7 @@ bool sendDirectionOnESPNow(char direction)
 }
 bool initESPNow()
 {
+    updateScreen('E');
     WiFi.mode(WIFI_STA);
     if (esp_now_init() != ESP_OK)
     {

@@ -4,7 +4,7 @@
 #include "udp-manager.h"
 #include "helpers.h"
 
-char modeArray[5] = {'E', 'L', 'M', 'U'};
+char modeArray[4] = {'E', 'L', 'M', 'U'};
 char currentMode = modeArray[0];
 
 void setup()
@@ -48,7 +48,6 @@ void loop()
     {
         Serial.println("Changing mode...");
         currentMode = nextMode(currentMode, modeArray);
-        updateScreen(currentMode);
         delay(2000);
         // Run the setup function again to reinitialize the selected mode
         setup();
