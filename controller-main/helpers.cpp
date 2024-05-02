@@ -6,7 +6,7 @@ int valueX = 0; // to store the X-axis value
 int valueY = 0; // to store the Y-axis value
 
 // Wifi credentials
-const char *ssid = "POCO X3 NFC";
+const char *ssid = "Hotspot";
 const char *password = "Kodeord1234";
 
 // Screen variables

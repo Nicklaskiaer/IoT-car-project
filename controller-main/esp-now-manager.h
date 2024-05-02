@@ -5,7 +5,6 @@
 #include <WiFi.h>
 #include "helpers.h"
 
-
 bool sendDirectionOnESPNow(char direction);
 bool initESPNow();
 
