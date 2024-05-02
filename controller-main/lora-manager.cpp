@@ -1,10 +1,10 @@
 #include "lora-manager.h"
 
-int RXD2 = 16;
-int TXD2 = 17;
+// int RXD2 = 16;
+// int TXD2 = 17;
 int RST = 23;
 int packageID = 0;
-String str;
+static String str;
 
 HardwareSerial loraSerial(2);
 
