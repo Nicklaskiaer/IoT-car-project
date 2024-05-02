@@ -4,7 +4,6 @@
 #include <WiFiUdp.h>
 #include "helpers.h"
 
-
 bool sendDirectionOnUDP(char direction);
 bool initUDP();
 

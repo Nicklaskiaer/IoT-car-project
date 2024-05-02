@@ -100,29 +100,34 @@ bool sendDirectionOnLoRa(char direction)
   Serial.print("packageID = ");
   Serial.println(packageID);
 
-  if (direction == 'f') {
+  if (direction == 'f')
+  {
     loraSerial.print("radio tx ");
     loraSerial.println("66"); // f
   }
-  else if (direction == 'b') {
+  else if (direction == 'b')
+  {
     loraSerial.print("radio tx ");
     loraSerial.println("62"); // b
   }
-  else if (direction == 'l') {
+  else if (direction == 'l')
+  {
     loraSerial.print("radio tx ");
     loraSerial.println("6C"); // l
   }
-  else if (direction == 'r') {
+  else if (direction == 'r')
+  {
     loraSerial.print("radio tx ");
     loraSerial.println("72"); // r
   }
-  else if (direction == 'x') {
+  else if (direction == 'x')
+  {
     loraSerial.print("radio tx ");
     loraSerial.println("78"); // x
   }
   Serial.print("Sent direction: ");
   Serial.println(direction);
-  
+
   // loraSerial.println(packageID);
   // str = loraSerial.readStringUntil('\n');
   // Serial.println(str);
