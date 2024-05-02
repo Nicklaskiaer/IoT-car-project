@@ -94,67 +94,73 @@ char nextMode(char currentMode, char *modeArray)
     {
         i++;
     }
-    if (i == 3)
+    if (i == 4)
     {
         return modeArray[0];
     }
     else
     {
-        return modeArray[i +1];
+        return modeArray[i + 1];
     }
 }
 
-bool initLCD(){
-  lcd.begin();
-  delay(250);
-  lcd.backlight();
-  lcd.setCursor(0, 0);
-  lcd.print("Initializing");
-  lcd.setCursor(0, 1);
-  lcd.print(".");
-  lcd.display();
-  return true;
+bool initLCD()
+{
+    lcd.begin(0x27, 16, 2);
+    delay(250);
+    lcd.backlight();
+    lcd.setCursor(0, 0);
+    lcd.print("Initializing");
+    lcd.setCursor(0, 1);
+    lcd.print(".");
+    lcd.display();
+    return true;
 }
 
 /*
 Function that updates the LCD screen for the controller to fit with the currently used protocol.
 */
-bool updateScreen(char currentMode){
-  if (currentMode == 'E') {
-      lcd.clear();
-      delay(50);
-      lcd.setCursor(0, 0);
-      lcd.print("Running");
-      lcd.setCursor(0, 1);
-      lcd.print("ESP NOW");
-      lcd.display();
+bool updateScreen(char currentMode)
+{
+    if (currentMode == 'E')
+    {
+        lcd.clear();
+        delay(50);
+        lcd.setCursor(0, 0);
+        lcd.print("Running");
+        lcd.setCursor(0, 1);
+        lcd.print("ESP NOW");
+        lcd.display();
     }
-    if (currentMode == 'L') {
-      lcd.clear();
-      delay(50);
-      lcd.setCursor(0, 0);
-      lcd.print("Running");
-      lcd.setCursor(0, 1);
-      lcd.print("LoRa");
-      lcd.display();
+    if (currentMode == 'L')
+    {
+        lcd.clear();
+        delay(50);
+        lcd.setCursor(0, 0);
+        lcd.print("Running");
+        lcd.setCursor(0, 1);
+        lcd.print("LoRa");
+        lcd.display();
     }
-    if (currentMode == 'M') {
-      lcd.clear();
-      delay(50);
-      lcd.setCursor(0, 0);
-      lcd.print("Running");
-      lcd.setCursor(0, 1);
-      lcd.print("MQTT");
-      lcd.display();
+    if (currentMode == 'M')
+    {
+        lcd.clear();
+        delay(50);
+        lcd.setCursor(0, 0);
+        lcd.print("Running");
+        lcd.setCursor(0, 1);
+        lcd.print("MQTT");
+        lcd.display();
     }
-    if (currentMode == 'U') {
-      lcd.clear();
-      delay(50);
-      lcd.setCursor(0, 0);
-      lcd.print("Running");
-      lcd.setCursor(0, 1);
-      lcd.print("UDP");
-      lcd.display();
+    if (currentMode == 'U')
+    {
+        lcd.clear();
+        delay(50);
+        lcd.setCursor(0, 0);
+        lcd.print("Running");
+        lcd.setCursor(0, 1);
+        lcd.print("UDP");
+        lcd.display();
     }
     return true;
 }
